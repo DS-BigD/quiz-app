@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f6fb" id="themeMeta">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="刷题小册">
+<title>刷题小册 · 随身题库</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ============ 首页 ============ -->
+  <section id="viewHome" class="view">
+    <header class="home-head">
+      <div class="brand">
+        <div class="brand-mark">刷</div>
+        <div class="brand-text">
+          <h1>刷题小册</h1>
+          <p id="bankSummary">题库加载中…</p>
+        </div>
+      </div>
+      <button class="icon-btn js-theme" aria-label="切换深浅色" title="切换深浅色">🌙</button>
+    </header>
+
+    <button id="resumeCard" class="resume-card hidden">
+      <span class="resume-icon">▶</span>
+      <span class="resume-text">
+        <strong id="resumeTitle">继续上次进度</strong>
+        <small id="resumeDetail"></small>
+      </span>
+      <span class="resume-arrow">›</span>
+    </button>
+
+    <div class="card">
+      <div class="card-head"><h2>练习模式</h2><span class="card-sub">选一个开刷</span></div>
+      <div class="seg" id="modeSeg">
+        <button class="seg-item active" data-mode="sequential">顺序练习</button>
+        <button class="seg-item" data-mode="random">随机刷题</button>
+        <button class="seg-item" data-mode="wrong">错题重练</button>
+      </div>
+      <p class="hint" id="modeHint"></p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>题型</h2><span class="card-sub" id="filterCount"></span></div>
+      <div class="chips" id="typeChips">
+        <button class="chip active" data-filter="all">全部</button>
+        <button class="chip" data-filter="单选题">单选题</button>
+        <button class="chip" data-filter="多选题">多选题</button>
+        <button class="chip" data-filter="判断题">判断题</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>每轮题量</h2><span class="card-sub">刷完自动出成绩</span></div>
+      <div class="chips" id="countChips">
+        <button class="chip active" data-count="20">20 题</button>
+        <button class="chip" data-count="50">50 题</button>
+        <button class="chip" data-count="100">100 题</button>
+        <button class="chip" data-count="all">全部</button>
+      </div>
+    </div>
+
+    <button id="startBtn" class="primary-btn start-btn">开始刷题 <span>→</span></button>
+
+    <div class="home-foot">
+      <span id="wrongCount" class="foot-stat">错题本 0 题</span>
+      <div class="foot-links">
+        <button id="clearWrongBtn" class="link-btn">清空错题本</button>
+        <button id="resetBtn" class="link-btn">重置进度</button>
+      </div>
+    </div>
+    <p class="tip">进度与错题只保存在本机浏览器：刷新页面不会丢，换设备／换浏览器不互通。</p>
+  </section>
+
+  <!-- ============ 答题页 ============ -->
+  <section id="viewQuiz" class="view hidden">
+    <header class="quiz-head">
+      <div class="quiz-head-row">
+        <button id="backBtn" class="icon-btn" aria-label="返回首页">←</button>
+        <div class="quiz-head-center">
+          <span id="quizCounter" class="counter">1 / 20</span>
+          <span id="quizAccuracy" class="accuracy">正确率 —</span>
+        </div>
+        <button class="icon-btn js-theme" aria-label="切换深浅色">🌙</button>
+      </div>
+      <div class="progress-track"><div id="progressBar" class="progress-fill"></div></div>
+    </header>
+
+    <main id="quizBody" class="quiz-body"></main>
+
+    <footer class="action-bar">
+      <button id="prevBtn" class="ghost-btn">上一题</button>
+      <button id="mainBtn" class="primary-btn">确认答案</button>
+    </footer>
+  </section>
+
+  <!-- ============ 结果页 ============ -->
+  <section id="viewResult" class="view hidden">
+    <header class="quiz-head">
+      <div class="quiz-head-row">
+        <button id="resultHomeBtn" class="icon-btn" aria-label="返回首页">←</button>
+        <div class="quiz-head-center"><span class="counter">本轮成绩</span></div>
+        <button class="icon-btn js-theme" aria-label="切换深浅色">🌙</button>
+      </div>
+    </header>
+    <main class="result-body">
+      <div class="result-emoji" id="resultEmoji">🎉</div>
+      <div class="result-rate" id="resultRate">0%</div>
+      <p class="result-label">正确率</p>
+      <div class="result-stats">
+        <div><strong id="resultCorrect">0</strong><span>答对</span></div>
+        <div><strong id="resultTotal">0</strong><span>总题数</span></div>
+        <div><strong id="resultWrong">0</strong><span>答错</span></div>
+      </div>
+      <p class="result-tip" id="resultTip"></p>
+      <button id="againBtn" class="primary-btn">再来一轮</button>
+      <button id="wrongRoundBtn" class="ghost-btn wide">只练错题</button>
+      <button id="resultHomeBtn2" class="link-btn wide-link">回到首页</button>
+    </main>
+  </section>
+
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
