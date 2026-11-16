@@ -42,6 +42,7 @@
         <button class="seg-item active" data-mode="sequential">顺序练习</button>
         <button class="seg-item" data-mode="random">随机刷题</button>
         <button class="seg-item" data-mode="wrong">错题重练</button>
+        <button class="seg-item" data-mode="range">指定起点</button>
       </div>
       <p class="hint" id="modeHint"></p>
     </div>
@@ -66,7 +67,23 @@
       </div>
     </div>
 
+    <div class="card hidden" id="startCard">
+      <div class="card-head"><h2>起始题号</h2><span class="card-sub" id="startRange"></span></div>
+      <div class="start-row">
+        <button class="step-btn" id="startMinus" aria-label="题号减一">−</button>
+        <input id="startInput" class="start-input" type="number" inputmode="numeric" min="1" value="1" aria-label="起始题号">
+        <button class="step-btn" id="startPlus" aria-label="题号加一">+</button>
+      </div>
+      <p class="hint" id="startHint"></p>
+    </div>
+
     <button id="startBtn" class="primary-btn start-btn">开始刷题 <span>→</span></button>
+
+    <button id="reportBtn" class="report-entry">
+      <span class="re-icon">📊</span>
+      <span class="re-text"><strong>学习报告</strong><small id="reportEntrySub">还没有答题记录</small></span>
+      <span class="resume-arrow">›</span>
+    </button>
 
     <div class="home-foot">
       <span id="wrongCount" class="foot-stat">错题本 0 题</span>
@@ -121,7 +138,48 @@
       <p class="result-tip" id="resultTip"></p>
       <button id="againBtn" class="primary-btn">再来一轮</button>
       <button id="wrongRoundBtn" class="ghost-btn wide">只练错题</button>
+      <button id="resultReportBtn" class="link-btn wide-link">查看学习报告</button>
       <button id="resultHomeBtn2" class="link-btn wide-link">回到首页</button>
+    </main>
+  </section>
+
+  <!-- ============ 学习报告页 ============ -->
+  <section id="viewReport" class="view hidden">
+    <header class="quiz-head">
+      <div class="quiz-head-row">
+        <button id="reportBackBtn" class="icon-btn" aria-label="返回首页">←</button>
+        <div class="quiz-head-center"><span class="counter">学习报告</span></div>
+        <button class="icon-btn js-theme" aria-label="切换深浅色">🌙</button>
+      </div>
+    </header>
+    <main class="report-body">
+      <div class="card">
+        <div class="card-head"><h2>已答题概览</h2><span class="card-sub">按题目去重</span></div>
+        <div class="report-big">
+          <div><strong id="repAnswered">0</strong><span>已答题数</span></div>
+          <div><strong id="repRateOk">0%</strong><span>答对率</span></div>
+          <div><strong id="repRateNo">0%</strong><span>答错率</span></div>
+        </div>
+        <div class="report-line">
+          <span>累计作答 <b id="repAttempts">0</b> 次</span>
+          <span>累计答错 <b id="repWrongTimes">0</b> 次</span>
+        </div>
+        <p class="hint">答对率／答错率按每道题「最后一次作答」去重统计：同一题刷多次只算一道。累计答错次数则记录全部历史作答。</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>分题型掌握情况</h2><span class="card-sub">去重 · 按最后作答</span></div>
+        <div id="typeBreakdown" class="tb-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>错题次数排行</h2><span class="card-sub">点题目单独练</span></div>
+        <div id="wrongRankList" class="rank-list"></div>
+        <button id="reportWrongBtn" class="ghost-btn wide">只练错题本（<span id="repWrongBook">0</span>）</button>
+      </div>
+
+      <button id="clearStatsBtn" class="link-btn clear-stats">清空学习统计（不影响错题本）</button>
+      <p class="tip">统计只保存在本机浏览器，换设备或清理浏览器数据不会同步。</p>
     </main>
   </section>
 
