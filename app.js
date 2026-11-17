@@ -21,7 +21,7 @@
     return {
       v: 1, mode: 'sequential', filter: 'all', count: 20,
       seqCursor: 0, startAt: 1, queue: [], index: 0, answers: {},
-      wrongIds: [], qstats: {}, theme: null, done: false
+      wrongIds: [], favIds: [], qstats: {}, theme: null, done: false
     };
   }
 
@@ -42,6 +42,11 @@
     if (!(d.count === 'all' || [20, 50, 100].indexOf(Number(d.count)) >= 0)) d.count = 20;
     if (!Array.isArray(d.wrongIds)) d.wrongIds = [];
     d.wrongIds = d.wrongIds.map(String).filter(function (id) { return !!BY_ID[id]; });
+    /* favIds：收藏题目，加载时去重并过滤无效 ID，保证收藏单不重复 */
+    if (!Array.isArray(d.favIds)) d.favIds = [];
+    d.favIds = d.favIds.map(String).filter(function (id, i, arr) {
+      return !!BY_ID[id] && arr.indexOf(id) === i;
+    });
     if (!Array.isArray(d.queue)) d.queue = [];
     d.queue = d.queue.map(String).filter(function (id) { return !!BY_ID[id]; });
     if (!d.answers || typeof d.answers !== 'object' || Array.isArray(d.answers)) d.answers = {};
@@ -110,7 +115,7 @@
   function normalize(arr) { return arr.slice().sort().join(''); }
   function roundLimit(n) { return state.count === 'all' ? n : Math.min(Number(state.count) || 20, n); }
   function showView(name) {
-    ['Home', 'Quiz', 'Result', 'Report'].forEach(function (v) {
+    ['Home', 'Quiz', 'Result', 'Report', 'Fav'].forEach(function (v) {
       $('#view' + v).classList.toggle('hidden', v !== name);
     });
     window.scrollTo(0, 0);
@@ -152,6 +157,16 @@
     return r;
   }
   function pct(part, total) { return total ? Math.round(part / total * 100) : 0; }
+
+  /* ---------------- 收藏 ---------------- */
+  function isFav(id) { return state.favIds.indexOf(String(id)) >= 0; }
+  /* toggle 语义：已收藏则取消，未收藏则添加；数组 + indexOf 保证天然去重 */
+  function toggleFav(id) {
+    id = String(id);
+    var i = state.favIds.indexOf(id);
+    if (i >= 0) { state.favIds.splice(i, 1); save(); return false; }
+    state.favIds.push(id); save(); return true;
+  }
 
   /* ---------------- 主题 ---------------- */
   function systemTheme() {
@@ -253,6 +268,9 @@
     $('#reportEntrySub').textContent = r.answered
       ? '已答 ' + r.answered + ' 题 · 答对率 ' + pct(r.mastered, r.answered) + '%'
       : '还没有答题记录，先去刷两题吧';
+    $('#favEntrySub').textContent = state.favIds.length
+      ? '已收藏 ' + state.favIds.length + ' 题'
+      : '点 ☆ 收藏题目';
 
     $$('#modeSeg .seg-item').forEach(function (b) { b.classList.toggle('active', b.dataset.mode === state.mode); });
     $$('#typeChips .chip').forEach(function (b) { b.classList.toggle('active', b.dataset.filter === state.filter); });
@@ -327,6 +345,11 @@
       : q.type === '判断题' ? '判断题 · 判断正误' : '单选题 · 选一个答案';
     var reshuffle = (state.mode === 'random' || state.mode === 'wrong')
       ? '<button class="reshuffle" id="reshuffleBtn">换一批 ↻</button>' : '';
+    var faved = isFav(q.id);
+    var favBtn = '<button class="fav-btn' + (faved ? ' faved' : '') + '" id="favBtn" ' +
+      'aria-label="' + (faved ? '取消收藏' : '收藏本题') + '" title="' + (faved ? '取消收藏' : '收藏本题') + '">' +
+      (faved ? '★' : '☆') + '</button>';
+    var metaActions = '<span class="q-meta-actions">' + favBtn + reshuffle + '</span>';
     var posInfo = '';
     if (state.mode === 'range' || state.mode === 'sequential') {
       var idx = pool().indexOf(q);
@@ -339,7 +362,7 @@
           '<span class="badge">' + esc(q.type) + '</span>' +
           '<span class="badge soft">' + esc(q.difficulty) + '</span>' +
           posInfo +
-          '<span class="q-num">#' + esc(q.id) + '</span>' + reshuffle +
+          '<span class="q-num">#' + esc(q.id) + '</span>' + metaActions +
         '</div>' +
         '<div class="q-text">' + esc(q.question) + '</div>' +
         '<p class="q-hint">' + hint + '</p>' +
@@ -377,6 +400,18 @@
     $$('#quizBody .option').forEach(function (el) {
       el.classList.toggle('is-selected', ans.picked.indexOf(el.dataset.key) >= 0);
     });
+  }
+
+  /* 收藏按钮只更新自身 DOM，不重渲染整题，避免打断作答 */
+  function refreshFavBtn() {
+    var q = currentQ();
+    var btn = $('#favBtn');
+    if (!q || !btn) return;
+    var faved = isFav(q.id);
+    btn.textContent = faved ? '★' : '☆';
+    btn.classList.toggle('faved', faved);
+    btn.setAttribute('aria-label', faved ? '取消收藏' : '收藏本题');
+    btn.setAttribute('title', faved ? '取消收藏' : '收藏本题');
   }
 
   function toggleOption(key) {
@@ -495,6 +530,31 @@
     }
   }
 
+  /* ---------------- 收藏夹 ---------------- */
+  function renderFav() {
+    var ids = state.favIds;
+    $('#favCountSub').textContent = ids.length + ' 题 · 已去重';
+    var list = $('#favList');
+    if (!ids.length) {
+      list.innerHTML = '<p class="empty">收藏夹还是空的，答题时点题面右上角的 ☆ 收藏。</p>';
+    } else {
+      list.innerHTML = ids.map(function (id, i) {
+        var q = BY_ID[id];
+        var txt = q ? q.question : id;
+        var short = txt.length > 44 ? txt.slice(0, 44) + '…' : txt;
+        return '<div class="fav-item" data-id="' + esc(id) + '">' +
+          '<span class="fav-no">' + (i + 1) + '</span>' +
+          '<button class="fav-q" data-act="practice" data-id="' + esc(id) + '">' + esc(short) + '</button>' +
+          '<button class="fav-star" data-act="unfav" data-id="' + esc(id) + '" aria-label="取消收藏" title="取消收藏">★</button>' +
+          '</div>';
+      }).join('');
+    }
+    var pb = $('#favPracticeBtn');
+    pb.disabled = ids.length === 0;
+    pb.textContent = ids.length ? '练习全部收藏题（' + ids.length + '）' : '收藏夹是空的';
+    $('#clearFavBtn').disabled = ids.length === 0;
+  }
+
   /* ---------------- 事件 ---------------- */
   function bind() {
     $$('.js-theme').forEach(function (b) { b.addEventListener('click', toggleTheme); });
@@ -542,6 +602,30 @@
     $('#resultReportBtn').addEventListener('click', function () { showView('Report'); renderReport(); });
     $('#reportBackBtn').addEventListener('click', function () { showView('Home'); renderHome(); });
 
+    /* 收藏夹入口与交互 */
+    $('#favEntryBtn').addEventListener('click', function () { showView('Fav'); renderFav(); });
+    $('#favBackBtn').addEventListener('click', function () { showView('Home'); renderHome(); });
+    $('#favList').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-act]'); if (!b) return;
+      var id = b.dataset.id;
+      if (b.dataset.act === 'practice') {
+        if (startQueue([id])) toast('单独练这道收藏题');
+      } else if (b.dataset.act === 'unfav') {
+        toggleFav(id);
+        renderFav(); renderHome();
+        toast('已取消收藏 ☆');
+      }
+    });
+    $('#favPracticeBtn').addEventListener('click', function () {
+      if (!state.favIds.length) return;
+      if (startQueue(state.favIds)) toast('练习全部收藏题 · ' + state.favIds.length + ' 题');
+    });
+    $('#clearFavBtn').addEventListener('click', function () {
+      if (!state.favIds.length) { toast('收藏夹本来就是空的'); return; }
+      if (!window.confirm('确定清空收藏夹吗？共 ' + state.favIds.length + ' 题，清空后不可恢复。')) return;
+      state.favIds = []; save(); renderFav(); renderHome(); toast('收藏夹已清空');
+    });
+
     $('#wrongRankList').addEventListener('click', function (e) {
       var b = e.target.closest('.rank-item'); if (!b) return;
       if (startQueue([b.dataset.id])) toast('单独练这道题');
@@ -577,6 +661,14 @@
     $('#quizBody').addEventListener('click', function (e) {
       var opt = e.target.closest('.option');
       if (opt) { toggleOption(opt.dataset.key); return; }
+      if (e.target.closest('#favBtn')) {
+        var q = currentQ();
+        if (!q) return;
+        var added = toggleFav(q.id);
+        refreshFavBtn();
+        toast(added ? '已收藏本题 ★' : '已取消收藏 ☆');
+        return;
+      }
       if (e.target.closest('#reshuffleBtn')) {
         if (!buildQueue()) return;
         renderQuiz(true);
@@ -632,6 +724,8 @@
       document.body.innerHTML = '<p style="padding:24px;line-height:1.8">题库未加载：请确认 data.js 与 index.html 放在同一目录，且文件完整。</p>';
       return;
     }
+    /* 把 loadState 里的规范化结果（去重、迁移、过滤）立即写回，避免脏数据残留 */
+    save();
     applyTheme();
     bind();
     renderHome();

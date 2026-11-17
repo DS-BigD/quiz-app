@@ -79,11 +79,16 @@
 
     <button id="startBtn" class="primary-btn start-btn">开始刷题 <span>→</span></button>
 
-    <button id="reportBtn" class="report-entry">
-      <span class="re-icon">📊</span>
-      <span class="re-text"><strong>学习报告</strong><small id="reportEntrySub">还没有答题记录</small></span>
-      <span class="resume-arrow">›</span>
-    </button>
+    <div class="entry-row">
+      <button id="reportBtn" class="entry-tile">
+        <span class="entry-icon">📊</span>
+        <span class="entry-text"><strong>学习报告</strong><small id="reportEntrySub">还没有答题记录</small></span>
+      </button>
+      <button id="favEntryBtn" class="entry-tile">
+        <span class="entry-icon entry-star">★</span>
+        <span class="entry-text"><strong>我的收藏</strong><small id="favEntrySub">点 ☆ 收藏题目</small></span>
+      </button>
+    </div>
 
     <div class="home-foot">
       <span id="wrongCount" class="foot-stat">错题本 0 题</span>
@@ -180,6 +185,27 @@
 
       <button id="clearStatsBtn" class="link-btn clear-stats">清空学习统计（不影响错题本）</button>
       <p class="tip">统计只保存在本机浏览器，换设备或清理浏览器数据不会同步。</p>
+    </main>
+  </section>
+
+  <!-- ============ 收藏夹页 ============ -->
+  <section id="viewFav" class="view hidden">
+    <header class="quiz-head">
+      <div class="quiz-head-row">
+        <button id="favBackBtn" class="icon-btn" aria-label="返回首页">←</button>
+        <div class="quiz-head-center"><span class="counter">我的收藏</span></div>
+        <button class="icon-btn js-theme" aria-label="切换深浅色">🌙</button>
+      </div>
+    </header>
+    <main class="fav-body">
+      <div class="card">
+        <div class="card-head"><h2>收藏题目</h2><span class="card-sub" id="favCountSub"></span></div>
+        <p class="hint">收藏单按题目去重，同一道题只会出现一次。点题目可单独练，点右侧 ★ 取消收藏。</p>
+        <div id="favList" class="fav-list"></div>
+      </div>
+      <button id="favPracticeBtn" class="primary-btn fav-practice">练习全部收藏题</button>
+      <button id="clearFavBtn" class="link-btn clear-fav">清空收藏夹</button>
+      <p class="tip">收藏只保存在本机浏览器，刷新页面不会丢，换设备不互通。</p>
     </main>
   </section>
 

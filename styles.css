@@ -159,21 +159,30 @@ button:disabled { cursor: not-allowed; opacity: .45; }
 .start-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .start-input:focus { outline: none; border-color: var(--brand); }
 
-/* 学习报告入口 */
-.report-entry {
-  display: flex; align-items: center; gap: 12px; width: calc(100% - 32px);
-  margin: 12px 16px 0; padding: 14px 16px; text-align: left;
+/* 学习报告 / 收藏 双入口（一行两列） */
+.entry-row { display: flex; gap: 10px; margin: 12px 16px 0; }
+.entry-tile {
+  flex: 1 1 0; min-width: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 13px; text-align: left;
   border-radius: 16px; border: 1px solid var(--border);
   background: var(--surface); color: var(--text); box-shadow: var(--shadow);
+  transition: transform .12s ease, border-color .15s ease;
 }
-.re-icon {
+.entry-tile:active { transform: scale(.98); border-color: var(--brand); }
+.entry-icon {
   width: 34px; height: 34px; flex: 0 0 34px; border-radius: 10px;
   background: var(--brand-soft); color: var(--brand);
   display: grid; place-items: center; font-size: 17px;
 }
-.re-text { display: flex; flex-direction: column; line-height: 1.4; }
-.re-text strong { font-size: 14.5px; }
-.re-text small { font-size: 12px; color: var(--muted); }
+.entry-icon.entry-star { color: #f5a623; }
+html[data-theme="dark"] .entry-icon.entry-star { color: #ffc451; }
+.entry-text { display: flex; flex-direction: column; line-height: 1.35; min-width: 0; }
+.entry-text strong { font-size: 13.5px; white-space: nowrap; }
+.entry-text small {
+  font-size: 11px; color: var(--muted); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
 .home-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 20px 18px 0; }
 .foot-stat { font-size: 13px; color: var(--muted); }
 .foot-links { display: flex; gap: 14px; }
@@ -202,7 +211,16 @@ button:disabled { cursor: not-allowed; opacity: .45; }
 .badge { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 7px; background: var(--brand-soft); color: var(--brand); }
 .badge.soft { background: var(--surface-2); color: var(--muted); }
 .q-num { font-size: 11.5px; color: var(--muted); }
-.reshuffle { margin-left: auto; font-size: 12.5px; color: var(--brand); font-weight: 600; padding: 4px 2px; }
+.q-meta-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.fav-btn {
+  font-size: 24px; line-height: 1; padding: 0 2px;
+  color: #c2c9d6; transition: transform .12s ease, color .15s ease;
+}
+.fav-btn:active { transform: scale(1.2); }
+.fav-btn.faved { color: #f5a623; }
+html[data-theme="dark"] .fav-btn { color: #5c6577; }
+html[data-theme="dark"] .fav-btn.faved { color: #ffc451; }
+.reshuffle { font-size: 12.5px; color: var(--brand); font-weight: 600; padding: 4px 2px; }
 .q-text { margin: 16px 0 0; font-size: 18px; line-height: 1.72; font-weight: 600; word-break: break-word; }
 .q-hint { margin: 8px 0 16px; font-size: 12px; color: var(--muted); }
 .options { display: flex; flex-direction: column; gap: 10px; }
@@ -317,6 +335,26 @@ button:disabled { cursor: not-allowed; opacity: .45; }
 .empty { margin: 0; padding: 14px 0; text-align: center; font-size: 13px; color: var(--muted); }
 .fb-times { margin-top: 8px; font-size: 12.5px; font-weight: 600; color: var(--no); }
 .clear-stats { display: block; margin: 18px auto 0; text-align: center; }
+
+/* ---------- 收藏 ---------- */
+.fav-body { padding: 6px 0 40px; animation: rise .3s ease both; }
+.fav-list { display: flex; flex-direction: column; gap: 8px; }
+.fav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; text-align: left;
+  border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2);
+}
+.fav-no {
+  flex: 0 0 22px; height: 22px; border-radius: 7px;
+  background: var(--brand-soft); color: var(--brand);
+  display: grid; place-items: center; font-size: 11px; font-weight: 800;
+}
+.fav-q { flex: 1; min-width: 0; text-align: left; font-size: 13px; line-height: 1.5; word-break: break-word; }
+.fav-star { flex: 0 0 auto; font-size: 22px; line-height: 1; color: #f5a623; padding: 2px; transition: transform .12s ease; }
+.fav-star:active { transform: scale(1.2); }
+html[data-theme="dark"] .fav-star { color: #ffc451; }
+.fav-practice { display: block; width: calc(100% - 32px); margin: 18px 16px 0; }
+.clear-fav { display: block; margin: 16px auto 0; text-align: center; }
 
 /* ---------- 提示条 ---------- */
 .toast {
