@@ -369,6 +369,99 @@ html[data-theme="dark"] .fav-star { color: #ffc451; }
 html[data-theme="dark"] .toast { background: #eef1f8; color: #11141c; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+/* ---------- 简答题模块 ---------- */
+.essay-entry {
+  display: flex; align-items: center; gap: 12px; width: calc(100% - 32px);
+  margin: 12px 16px 0; padding: 14px; text-align: left;
+  border: 1px solid var(--border); border-radius: 14px;
+  background: linear-gradient(135deg, var(--brand-soft), var(--surface));
+  box-shadow: var(--shadow); transition: transform .12s ease;
+}
+.essay-entry:active { transform: scale(.985); }
+.essay-entry .entry-icon { background: var(--brand); color: var(--on-brand); }
+
+.essay-body { padding: 6px 16px 40px; animation: rise .3s ease both; }
+.essay-list { display: flex; flex-direction: column; gap: 9px; margin-top: 14px; }
+.essay-item {
+  display: flex; align-items: center; gap: 11px; width: 100%;
+  padding: 12px; text-align: left;
+  border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2);
+  transition: border-color .12s ease, transform .12s ease;
+}
+.essay-item:active { transform: scale(.99); border-color: var(--brand); }
+.essay-no {
+  flex: 0 0 26px; height: 26px; border-radius: 8px;
+  background: var(--brand-soft); color: var(--brand);
+  display: grid; place-items: center; font-size: 12px; font-weight: 800;
+}
+.essay-item-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.essay-item-top { display: flex; align-items: center; gap: 8px; }
+.essay-score { font-size: 11.5px; color: var(--muted); }
+.essay-item-preview { font-size: 13px; line-height: 1.5; color: var(--text); word-break: break-word; }
+.essay-item-arrow { flex: 0 0 auto; font-size: 22px; color: var(--muted); }
+
+.essay-detail-body { padding: 16px 16px 120px; animation: rise .3s ease both; }
+.essay-detail-card {
+  border: 1px solid var(--border); border-radius: 16px;
+  background: var(--surface); box-shadow: var(--shadow); padding: 18px;
+}
+.essay-block { margin-top: 20px; }
+.essay-block-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-bottom: 10px;
+}
+.essay-block-tag {
+  display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: .08em;
+  padding: 4px 10px; border-radius: 8px; background: var(--brand-soft); color: var(--brand);
+}
+.essay-block-tag.answer { background: var(--ok-soft); color: var(--ok); }
+.essay-toggle {
+  font-size: 12.5px; font-weight: 700; color: var(--brand);
+  padding: 5px 10px; border: 1px solid var(--brand);
+  border-radius: 999px; transition: background .12s ease;
+}
+.essay-toggle:active { background: var(--brand-soft); }
+.essay-content {
+  font-size: 15px; line-height: 1.85; color: var(--text);
+  white-space: pre-wrap; word-break: break-word;
+}
+.essay-content.stem-text { font-size: 16px; line-height: 1.8; font-weight: 500; }
+.essay-content.answer-text {
+  padding: 14px; border-radius: 12px; background: var(--surface-2);
+  border-left: 3px solid var(--ok); font-size: 14.5px;
+}
+.essay-answer-mask {
+  margin-top: 2px; padding: 20px 14px; text-align: center;
+  font-size: 13px; color: var(--muted);
+  border: 1px dashed var(--border); border-radius: 12px; background: var(--surface-2);
+}
+/* 简答题内嵌示意图 */
+.essay-figure { margin: 14px 0; text-align: center; }
+.essay-img {
+  display: block; max-width: 100%; height: auto;
+  margin: 0 auto; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface-2); cursor: zoom-in;
+}
+.essay-figure figcaption {
+  margin-top: 6px; font-size: 11.5px; color: var(--muted);
+}
+/* 图片点击放大 */
+.essay-lightbox {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; padding: 40px 16px;
+  background: rgba(10, 14, 24, .9);
+}
+.essay-lightbox img {
+  max-width: 100%; max-height: 82vh; height: auto;
+  border-radius: 10px; box-shadow: 0 12px 40px rgba(0, 0, 0, .5);
+}
+.essay-lightbox-close {
+  position: absolute; top: 18px; right: 22px;
+  font-size: 30px; line-height: 1; color: #fff; opacity: .85;
+}
+.essay-lightbox-cap { font-size: 12px; color: rgba(255, 255, 255, .7); }
+
 @keyframes rise {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }

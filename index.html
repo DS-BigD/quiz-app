@@ -90,6 +90,12 @@
       </button>
     </div>
 
+    <button id="essayEntryBtn" class="essay-entry">
+      <span class="entry-icon">📝</span>
+      <span class="entry-text"><strong>简答题 · 题目与答案</strong><small id="essayEntrySub">共 11 题 · 点开直接预览</small></span>
+      <span class="resume-arrow">›</span>
+    </button>
+
     <div class="home-foot">
       <span id="wrongCount" class="foot-stat">错题本 0 题</span>
       <div class="foot-links">
@@ -209,10 +215,47 @@
     </main>
   </section>
 
+  <!-- ============ 简答题列表页 ============ -->
+  <section id="viewEssay" class="view hidden">
+    <header class="quiz-head">
+      <div class="quiz-head-row">
+        <button id="essayBackBtn" class="icon-btn" aria-label="返回首页">←</button>
+        <div class="quiz-head-center"><span class="counter">简答题</span></div>
+        <button class="icon-btn js-theme" aria-label="切换深浅色">🌙</button>
+      </div>
+    </header>
+    <main class="essay-body">
+      <div class="card">
+        <div class="card-head"><h2>按主题浏览</h2><span class="card-sub" id="essayCountSub"></span></div>
+        <div class="chips" id="essayChips"></div>
+        <div id="essayList" class="essay-list"></div>
+      </div>
+      <p class="tip">点开题目即可直接查看完整题干与参考答案；想自测可点「隐藏参考答案」遮住答案。</p>
+    </main>
+  </section>
+
+  <!-- ============ 简答题详情页 ============ -->
+  <section id="viewEssayDetail" class="view hidden">
+    <header class="quiz-head">
+      <div class="quiz-head-row">
+        <button id="essayDetailBackBtn" class="icon-btn" aria-label="返回列表">←</button>
+        <div class="quiz-head-center"><span id="essayDetailCounter" class="counter">1 / 11</span></div>
+        <button class="icon-btn js-theme" aria-label="切换深浅色">🌙</button>
+      </div>
+    </header>
+    <main id="essayDetailBody" class="essay-detail-body"></main>
+    <footer class="action-bar">
+      <button id="essayPrevBtn" class="ghost-btn">上一题</button>
+      <button id="essayNextBtn" class="primary-btn">下一题</button>
+    </footer>
+  </section>
+
 </div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script src="data.js"></script>
+<script src="essay-data.js"></script>
 <script src="app.js"></script>
+<script src="essay.js"></script>
 </body>
 </html>
