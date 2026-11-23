@@ -385,6 +385,98 @@
     }).join('');
   }
 
+  /* ---------- 问题 / 答案逐条配对 ----------
+     把题干与答案都按行首的「问题N：/任务N：/第N问：」切成段，按序号一一配对。
+     无分段的整块题（如教学大纲、代码题）返回单段。 */
+  function cn2num(s) {
+    var m = { '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10 };
+    return /^\d+$/.test(s) ? parseInt(s, 10) : (m[s] || 0);
+  }
+  var MAIN_RE = /(?:^|\n)[ \t]*(问题|任务)([一二三四五六七八九十\d]+)[：:]?[ \t]*(?=\n|$|\S)|(?:^|\n)[ \t]*(第)([一二三四五六七八九十\d]+)(问)[：:]?[ \t]*(?=\n|$|\S)/g;
+
+  function splitByMain(text) {
+    text = String(text || '');
+    var pts = [], m;
+    MAIN_RE.lastIndex = 0;
+    while ((m = MAIN_RE.exec(text)) !== null) {
+      var g = m[1] || m[3];
+      var numStr = m[2] || m[4];
+      var lead = m[0].charAt(0) === '\n' ? 1 : 0;
+      /* 标记整体在原文中的结束位置，用于生成 head */
+      var word = g + numStr + (m[5] || '');
+      pts.push({ idx: m.index + lead, end: m.index + m[0].length, word: word, num: cn2num(numStr) });
+    }
+    if (!pts.length) return null;
+    return pts.map(function (p, i) {
+      var end = (i + 1 < pts.length) ? pts[i + 1].idx : text.length;
+      var seg = text.slice(p.idx, end);
+      var firstNl = seg.indexOf('\n');
+      /* head = 标记所在首行；body = 其后所有行（避免首行内容重复） */
+      var headLine = (firstNl >= 0 ? seg.slice(0, firstNl) : seg).trim();
+      var body = (firstNl >= 0 ? seg.slice(firstNl + 1) : '').trim();
+      return { num: p.num, head: headLine || p.word, body: body };
+    });
+  }
+
+  /* 生成逐条交错的「问题 → 答案」结构；背景段单独返回 */
+  function buildPairs(q) {
+    var stem = String(q.stem || '');
+    var qs = splitByMain(stem);
+    var as = splitByMain(q.answer);
+    var background = '';
+
+    if (!qs) {
+      /* 无问题分段：整题作为一组，题干即问题 */
+      background = '';
+      return { background: background, pairs: [{ q: stem, a: q.answer, whole: true }] };
+    }
+
+    /* 第一个标记之前为背景描述 */
+    var firstMatch = MAIN_RE.exec(stem);
+    MAIN_RE.lastIndex = 0;
+    /* 用 qs 的 head 在 stem 中定位第一段起点来切背景 */
+    var firstIdx = stem.indexOf(qs[0].head.split(/[：:]/)[0]);
+    if (firstIdx > 0) background = stem.slice(0, firstIdx).trim();
+
+    var pairs = qs.map(function (seg, i) {
+      var ans = as && as[i] ? as[i] : null;
+      var qText = seg.head + (seg.body ? '\n' + seg.body : '');
+      /* 答案段首行的编号标记（第一问：/问题一）因徽章已标明序号，去掉避免重复 */
+      var aHead = ans ? ans.head.replace(/^(问题|任务|第)[一二三四五六七八九十\d]+\s*问?\s*[：:]?\s*/, '') : '';
+      var aText = ans ? (aHead + (ans.body ? '\n' + ans.body : '')) : '';
+      return { q: qText, a: aText.trim(), num: seg.num };
+    });
+    return { background: background, pairs: pairs };
+  }
+
+  /* 渲染题目背景（去掉问题分段后的纯背景） */
+  function renderBackground(text) {
+    if (!text) return '';
+    return '<div class="essay-block">' +
+      '<div class="essay-block-head"><span class="essay-block-tag">题目背景</span></div>' +
+      '<div class="essay-content stem-text">' + richText(text) + '</div>' +
+      '</div>';
+  }
+
+  /* 渲染逐条交错的问题-答案对 */
+  function renderPairs(q) {
+    var data = buildPairs(q);
+    var html = renderBackground(data.background);
+    data.pairs.forEach(function (p, i) {
+      html += '<div class="essay-pair">' +
+        '<div class="pair-q">' +
+          '<span class="pair-badge">问题' + (p.num || (i + 1)) + '</span>' +
+          '<div class="pair-q-text">' + richText(p.q, false) + '</div>' +
+        '</div>' +
+        '<div class="pair-a">' +
+          '<div class="pair-a-head">参考答案</div>' +
+          '<div class="essay-content answer-text">' + richText(p.a, true) + '</div>' +
+        '</div>' +
+      '</div>';
+    });
+    return html;
+  }
+
   /* 颜色图例：帮助把四类颜色与备考维度对应起来 */
   function kwLegend() {
     return '<div class="essay-kw-legend">' +
@@ -452,14 +544,14 @@
       (state.highlight ? '关闭高亮' : '开启高亮') + '</button>';
 
     var ansBlock = state.showAnswer
-      ? '<div class="essay-block">' +
+      ? '<div class="essay-pair-wrap">' +
           '<div class="essay-block-head">' +
-            '<span class="essay-block-tag answer">参考答案</span>' +
+            '<span class="essay-block-tag answer">参考答案 · 逐题对照</span>' +
             '<span class="essay-block-actions">' + kwBtn +
               '<button id="essayToggleAns" class="essay-toggle">隐藏参考答案</button></span>' +
           '</div>' +
           kwLegend() +
-          '<div class="essay-content answer-text">' + richText(q.answer, true) + '</div>' +
+          renderPairs(q) +
         '</div>'
       : '<div class="essay-block">' +
           '<div class="essay-block-head"><span class="essay-block-tag answer">参考答案</span>' +
@@ -474,10 +566,6 @@
           '<span class="badge soft">' + esc(q.category || '简答题') + '</span>' +
           '<span class="badge soft">' + esc(q.score || '') + '</span>' +
           '<span class="q-num">#' + esc(q.id) + '</span>' +
-        '</div>' +
-        '<div class="essay-block">' +
-          '<div class="essay-block-head"><span class="essay-block-tag">题目</span></div>' +
-          '<div class="essay-content stem-text">' + richText(q.stem) + '</div>' +
         '</div>' +
         ansBlock +
       '</div>';
