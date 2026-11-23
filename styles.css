@@ -462,6 +462,72 @@ html[data-theme="dark"] .toast { background: #eef1f8; color: #11141c; }
 }
 .essay-lightbox-cap { font-size: 12px; color: rgba(255, 255, 255, .7); }
 
+/* ---- 答案核心术语高亮（四类配色，深浅主题自适应） ---- */
+.essay-block-actions { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.kw-toggle { color: var(--brand); }
+
+.essay-kw {
+  --kw-fg: #1b2334; --kw-bg: #eef1ff; --kw-bd: #c9d2ff;
+  color: var(--kw-fg); background: var(--kw-bg);
+  border-bottom: 2px solid var(--kw-bd);
+  border-radius: 4px; padding: 0 3px; margin: 0 1px;
+  font-weight: 600; font-style: normal;
+}
+/* 数据处理：青蓝 */
+.essay-kw.kw-flow { --kw-fg: #0b6e8a; --kw-bg: #e2f6fb; --kw-bd: #7fd3e8; }
+/* 模型算法：紫 */
+.essay-kw.kw-model { --kw-fg: #6d3fc4; --kw-bg: #f0e9fd; --kw-bd: #c3a8f0; }
+/* 评估指标：橙 */
+.essay-kw.kw-metric { --kw-fg: #a85a09; --kw-bg: #fff1dc; --kw-bd: #f3c47e; }
+/* 业务场景：绿 */
+.essay-kw.kw-scene { --kw-fg: #127a46; --kw-bg: #e3f7ec; --kw-bd: #83d6a8; }
+
+html[data-theme="dark"] .essay-kw.kw-flow { --kw-fg: #7fe3f5; --kw-bg: #123642; --kw-bd: #2b7d91; }
+html[data-theme="dark"] .essay-kw.kw-model { --kw-fg: #cbb0ff; --kw-bg: #2e2547; --kw-bd: #6f56a8; }
+html[data-theme="dark"] .essay-kw.kw-metric { --kw-fg: #ffc27a; --kw-bg: #3d2e1c; --kw-bd: #9c7133; }
+html[data-theme="dark"] .essay-kw.kw-scene { --kw-fg: #8fe6b6; --kw-bg: #16352a; --kw-bd: #3e8f66; }
+
+.essay-kw-legend {
+  display: flex; flex-wrap: wrap; gap: 8px 14px;
+  margin-bottom: 2px; padding: 4px 2px 0;
+  font-size: 12px; color: var(--muted);
+}
+.kw-legend-item { display: inline-flex; align-items: center; }
+.kw-legend-item .essay-kw { font-size: 11.5px; font-weight: 600; padding: 1px 6px; border-bottom-width: 2px; }
+
+/* 带释义的高亮词：可点击、手型、虚线下划线提示 */
+.essay-kw.has-tip { cursor: pointer; border-bottom-style: dashed; }
+.essay-kw.has-tip:active { filter: brightness(.92); }
+
+/* 术语释义浮层 */
+.essay-tip {
+  position: absolute; z-index: 60;
+  width: min(320px, calc(100vw - 32px));
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: 0 12px 36px rgba(20, 32, 70, .18);
+  padding: 13px 14px 11px; animation: tipIn .16s ease both;
+}
+@keyframes tipIn {
+  from { opacity: 0; transform: translateY(5px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.essay-tip-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.essay-tip-head .essay-kw { font-size: 14px; padding: 2px 7px; }
+.essay-tip-label { font-size: 11.5px; color: var(--muted); }
+.essay-tip-close {
+  margin-left: auto; width: 24px; height: 24px; line-height: 22px;
+  text-align: center; border-radius: 50%; font-size: 17px;
+  color: var(--muted); background: var(--surface-2);
+}
+.essay-tip-body {
+  margin-top: 10px; font-size: 13.5px; line-height: 1.7; color: var(--text);
+}
+.essay-tip-foot {
+  margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--border);
+  font-size: 11px; color: var(--muted);
+}
+
 @keyframes rise {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
